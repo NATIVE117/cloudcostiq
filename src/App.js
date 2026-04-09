@@ -12,10 +12,10 @@ const CLOUD_SERVICES = {
     icon: Cpu,
     unit: "per hour",
     options: [
-      { name: "Small (2 vCPU, 4GB)", aws: 0.0416, azure: 0.042, gcp: 0.0335 },    // t3.medium / B2s / e2-medium
-      { name: "Medium (4 vCPU, 16GB)", aws: 0.1664, azure: 0.166, gcp: 0.1340 },   // t3.xlarge / B4ms / e2-standard-4
-      { name: "Large (8 vCPU, 32GB)", aws: 0.3328, azure: 0.332, gcp: 0.2680 },    // t3.2xlarge / D8s_v5 / e2-standard-8
-      { name: "XL (16 vCPU, 64GB)", aws: 0.6656, azure: 0.664, gcp: 0.5360 },      // m5.4xlarge / D16s_v5 / e2-standard-16
+      { name: "Small (2 vCPU, 4GB)", aws: 0.0416, azure: 0.042, gcp: 0.0335, hetzner: 0.0066, ovh: 0.0120, scaleway: 0.0110 },
+      { name: "Medium (4 vCPU, 16GB)", aws: 0.1664, azure: 0.166, gcp: 0.1340, hetzner: 0.0124, ovh: 0.0310, scaleway: 0.0300 },
+      { name: "Large (8 vCPU, 32GB)", aws: 0.3328, azure: 0.332, gcp: 0.2680, hetzner: 0.0300, ovh: 0.0620, scaleway: 0.0580 },
+      { name: "XL (16 vCPU, 64GB)", aws: 0.6656, azure: 0.664, gcp: 0.5360, hetzner: 0.0593, ovh: 0.1240, scaleway: 0.1160 },
     ],
   },
   blockStorage: {
@@ -23,9 +23,9 @@ const CLOUD_SERVICES = {
     icon: HardDrive,
     unit: "per GB/month",
     options: [
-      { name: "SSD (General Purpose)", aws: 0.08, azure: 0.075, gcp: 0.068 },      // gp3 / Premium SSD v2 / pd-ssd
-      { name: "SSD (Provisioned IOPS)", aws: 0.125, azure: 0.12, gcp: 0.10 },      // io2 / Ultra Disk / pd-extreme
-      { name: "HDD (Standard)", aws: 0.045, azure: 0.04, gcp: 0.040 },             // st1 / Standard HDD / pd-standard
+      { name: "SSD (General Purpose)", aws: 0.08, azure: 0.075, gcp: 0.068, hetzner: 0.048, ovh: 0.044, scaleway: 0.056 },
+      { name: "SSD (Provisioned IOPS)", aws: 0.125, azure: 0.12, gcp: 0.10, hetzner: null, ovh: null, scaleway: null },
+      { name: "HDD (Standard)", aws: 0.045, azure: 0.04, gcp: 0.040, hetzner: null, ovh: 0.025, scaleway: null },
     ],
   },
   objectStorage: {
@@ -33,9 +33,9 @@ const CLOUD_SERVICES = {
     icon: Database,
     unit: "per GB/month",
     options: [
-      { name: "Standard (first 50TB)", aws: 0.023, azure: 0.0208, gcp: 0.020 },    // S3 Standard / Blob Hot / Cloud Storage
-      { name: "Infrequent Access", aws: 0.0125, azure: 0.010, gcp: 0.010 },        // S3 IA / Cool / Nearline
-      { name: "Archive", aws: 0.004, azure: 0.002, gcp: 0.004 },                   // Glacier / Archive / Coldline
+      { name: "Standard (first 50TB)", aws: 0.023, azure: 0.0208, gcp: 0.020, hetzner: 0.006, ovh: 0.007, scaleway: 0.009 },
+      { name: "Infrequent Access", aws: 0.0125, azure: 0.010, gcp: 0.010, hetzner: null, ovh: 0.002, scaleway: 0.002 },
+      { name: "Archive", aws: 0.004, azure: 0.002, gcp: 0.004, hetzner: null, ovh: 0.0012, scaleway: 0.001 },
     ],
   },
   database: {
@@ -43,10 +43,10 @@ const CLOUD_SERVICES = {
     icon: Server,
     unit: "per hour",
     options: [
-      { name: "Small (2 vCPU, 8GB)", aws: 0.096, azure: 0.098, gcp: 0.090 },      // RDS db.t3.large / Azure SQL 2vc / Cloud SQL
-      { name: "Medium (4 vCPU, 16GB)", aws: 0.192, azure: 0.196, gcp: 0.180 },
-      { name: "Large (8 vCPU, 32GB)", aws: 0.384, azure: 0.392, gcp: 0.360 },
-      { name: "XL (16 vCPU, 64GB)", aws: 0.768, azure: 0.784, gcp: 0.720 },
+      { name: "Small (2 vCPU, 8GB)", aws: 0.096, azure: 0.098, gcp: 0.090, hetzner: null, ovh: 0.065, scaleway: 0.058 },
+      { name: "Medium (4 vCPU, 16GB)", aws: 0.192, azure: 0.196, gcp: 0.180, hetzner: null, ovh: 0.130, scaleway: 0.116 },
+      { name: "Large (8 vCPU, 32GB)", aws: 0.384, azure: 0.392, gcp: 0.360, hetzner: null, ovh: 0.260, scaleway: 0.232 },
+      { name: "XL (16 vCPU, 64GB)", aws: 0.768, azure: 0.784, gcp: 0.720, hetzner: null, ovh: 0.520, scaleway: null },
     ],
   },
   cache: {
@@ -54,9 +54,9 @@ const CLOUD_SERVICES = {
     icon: CircleDot,
     unit: "per hour",
     options: [
-      { name: "Small (1 node, 1.5GB)", aws: 0.034, azure: 0.034, gcp: 0.036 },    // ElastiCache / Azure Cache / Memorystore
-      { name: "Medium (1 node, 6GB)", aws: 0.068, azure: 0.068, gcp: 0.072 },
-      { name: "Large (1 node, 13GB)", aws: 0.136, azure: 0.136, gcp: 0.144 },
+      { name: "Small (1 node, 1.5GB)", aws: 0.034, azure: 0.034, gcp: 0.036, hetzner: null, ovh: null, scaleway: null },
+      { name: "Medium (1 node, 6GB)", aws: 0.068, azure: 0.068, gcp: 0.072, hetzner: null, ovh: null, scaleway: null },
+      { name: "Large (1 node, 13GB)", aws: 0.136, azure: 0.136, gcp: 0.144, hetzner: null, ovh: null, scaleway: null },
     ],
   },
   kubernetes: {
@@ -64,9 +64,9 @@ const CLOUD_SERVICES = {
     icon: Container,
     unit: "per cluster/hour",
     options: [
-      { name: "Control Plane only", aws: 0.10, azure: 0.00, gcp: 0.10 },           // EKS / AKS (free!) / GKE
-      { name: "Control Plane + 3 Nodes (4vCPU)", aws: 0.244, azure: 0.123, gcp: 0.232 },
-      { name: "Control Plane + 6 Nodes (4vCPU)", aws: 0.388, azure: 0.246, gcp: 0.364 },
+      { name: "Control Plane only", aws: 0.10, azure: 0.00, gcp: 0.10, hetzner: null, ovh: 0.00, scaleway: 0.00 },
+      { name: "Control Plane + 3 Nodes (4vCPU)", aws: 0.244, azure: 0.123, gcp: 0.232, hetzner: null, ovh: 0.093, scaleway: 0.090 },
+      { name: "Control Plane + 6 Nodes (4vCPU)", aws: 0.388, azure: 0.246, gcp: 0.364, hetzner: null, ovh: 0.186, scaleway: 0.180 },
     ],
   },
   loadBalancer: {
@@ -74,9 +74,9 @@ const CLOUD_SERVICES = {
     icon: Scale,
     unit: "per hour",
     options: [
-      { name: "Application LB (basic)", aws: 0.0225, azure: 0.025, gcp: 0.025 },   // ALB / App GW / HTTP(S) LB
-      { name: "Application LB + 1 LCU/hr", aws: 0.030, azure: 0.032, gcp: 0.025 },
-      { name: "Network LB", aws: 0.0225, azure: 0.005, gcp: 0.025 },               // NLB / LB Standard / TCP LB
+      { name: "Application LB (basic)", aws: 0.0225, azure: 0.025, gcp: 0.025, hetzner: 0.008, ovh: 0.012, scaleway: 0.009 },
+      { name: "Application LB + 1 LCU/hr", aws: 0.030, azure: 0.032, gcp: 0.025, hetzner: 0.008, ovh: 0.012, scaleway: 0.009 },
+      { name: "Network LB", aws: 0.0225, azure: 0.005, gcp: 0.025, hetzner: 0.008, ovh: 0.012, scaleway: 0.009 },
     ],
   },
   natGateway: {
@@ -84,8 +84,8 @@ const CLOUD_SERVICES = {
     icon: DoorOpen,
     unit: "per hour + per GB",
     options: [
-      { name: "NAT Gateway (hourly)", aws: 0.045, azure: 0.045, gcp: 0.044 },
-      { name: "NAT Data Processing (per GB)", aws: 0.045, azure: 0.045, gcp: 0.045 },
+      { name: "NAT Gateway (hourly)", aws: 0.045, azure: 0.045, gcp: 0.044, hetzner: null, ovh: null, scaleway: 0.012 },
+      { name: "NAT Data Processing (per GB)", aws: 0.045, azure: 0.045, gcp: 0.045, hetzner: null, ovh: null, scaleway: 0.01 },
     ],
   },
   functions: {
@@ -93,9 +93,9 @@ const CLOUD_SERVICES = {
     icon: Zap,
     unit: "per 1M requests",
     options: [
-      { name: "128MB, <1s exec", aws: 0.20, azure: 0.20, gcp: 0.40 },             // Lambda / Azure Func / Cloud Func
-      { name: "256MB, <1s exec", aws: 0.40, azure: 0.40, gcp: 0.80 },
-      { name: "512MB, <1s exec", aws: 0.80, azure: 0.80, gcp: 1.60 },
+      { name: "128MB, <1s exec", aws: 0.20, azure: 0.20, gcp: 0.40, hetzner: null, ovh: null, scaleway: 0.15 },
+      { name: "256MB, <1s exec", aws: 0.40, azure: 0.40, gcp: 0.80, hetzner: null, ovh: null, scaleway: 0.30 },
+      { name: "512MB, <1s exec", aws: 0.80, azure: 0.80, gcp: 1.60, hetzner: null, ovh: null, scaleway: 0.60 },
     ],
   },
   cdn: {
@@ -103,9 +103,9 @@ const CLOUD_SERVICES = {
     icon: Globe,
     unit: "per GB out",
     options: [
-      { name: "First 10TB", aws: 0.085, azure: 0.081, gcp: 0.085 },
-      { name: "10-50TB", aws: 0.080, azure: 0.075, gcp: 0.065 },
-      { name: "50-150TB", aws: 0.060, azure: 0.065, gcp: 0.045 },
+      { name: "First 10TB", aws: 0.085, azure: 0.081, gcp: 0.085, hetzner: 0.00, ovh: 0.011, scaleway: 0.009 },
+      { name: "10-50TB", aws: 0.080, azure: 0.075, gcp: 0.065, hetzner: 0.00, ovh: 0.011, scaleway: 0.009 },
+      { name: "50-150TB", aws: 0.060, azure: 0.065, gcp: 0.045, hetzner: 0.00, ovh: 0.011, scaleway: 0.009 },
     ],
   },
   dataWarehouse: {
@@ -113,9 +113,9 @@ const CLOUD_SERVICES = {
     icon: BarChart3,
     unit: "per hour / per TB scanned",
     options: [
-      { name: "On-demand query (per TB)", aws: 5.00, azure: 5.00, gcp: 6.25 },     // Redshift Serverless / Synapse / BigQuery
-      { name: "Provisioned (2 nodes, small)", aws: 0.50, azure: 0.48, gcp: 0.00 }, // BigQuery slots = different model
-      { name: "Storage (per GB/month)", aws: 0.024, azure: 0.023, gcp: 0.020 },
+      { name: "On-demand query (per TB)", aws: 5.00, azure: 5.00, gcp: 6.25, hetzner: null, ovh: null, scaleway: null },
+      { name: "Provisioned (2 nodes, small)", aws: 0.50, azure: 0.48, gcp: 0.00, hetzner: null, ovh: null, scaleway: null },
+      { name: "Storage (per GB/month)", aws: 0.024, azure: 0.023, gcp: 0.020, hetzner: null, ovh: null, scaleway: null },
     ],
   },
   aiMl: {
@@ -123,9 +123,9 @@ const CLOUD_SERVICES = {
     icon: Bot,
     unit: "per 1K tokens / per 1K images",
     options: [
-      { name: "LLM API (input, per 1K tok)", aws: 0.003, azure: 0.003, gcp: 0.00125 },  // Bedrock Claude / Azure OpenAI / Gemini
-      { name: "LLM API (output, per 1K tok)", aws: 0.015, azure: 0.015, gcp: 0.005 },
-      { name: "Image Generation (per image)", aws: 0.04, azure: 0.04, gcp: 0.04 },
+      { name: "LLM API (input, per 1K tok)", aws: 0.003, azure: 0.003, gcp: 0.00125, hetzner: null, ovh: 0.003, scaleway: null },
+      { name: "LLM API (output, per 1K tok)", aws: 0.015, azure: 0.015, gcp: 0.005, hetzner: null, ovh: 0.015, scaleway: null },
+      { name: "Image Generation (per image)", aws: 0.04, azure: 0.04, gcp: 0.04, hetzner: null, ovh: null, scaleway: null },
     ],
   },
 };
@@ -134,13 +134,21 @@ const PROVIDER_COLORS = {
   aws: "#FF9900",
   azure: "#0078D4",
   gcp: "#4285F4",
+  hetzner: "#D50C2D",
+  ovh: "#000E9C",
+  scaleway: "#4F0599",
 };
 
 const PROVIDER_NAMES = {
   aws: "AWS",
   azure: "Azure",
   gcp: "GCP",
+  hetzner: "Hetzner",
+  ovh: "OVH",
+  scaleway: "Scaleway",
 };
+
+const ALL_PROVIDERS = ["aws", "azure", "gcp", "hetzner", "ovh", "scaleway"];
 
 const MONO = `'DM Mono', 'Menlo', monospace`;
 const SANS = `'DM Sans', 'Helvetica Neue', sans-serif`;
@@ -208,7 +216,8 @@ function App() {
   };
 
   const calculateCosts = () => {
-    let totals = { aws: 0, azure: 0, gcp: 0 };
+    let totals = {};
+    ALL_PROVIDERS.forEach((p) => (totals[p] = 0));
     let breakdown = [];
 
     Object.entries(selections).forEach(([key, { category, optionIdx }]) => {
@@ -216,15 +225,14 @@ function App() {
       const option = service.options[optionIdx];
       const qty = quantities[key] || 0;
 
-      const costs = {
-        aws: option.aws * qty,
-        azure: option.azure * qty,
-        gcp: option.gcp * qty,
-      };
+      const costs = {};
+      ALL_PROVIDERS.forEach((p) => {
+        costs[p] = option[p] != null ? option[p] * qty : null;
+      });
 
-      totals.aws += costs.aws;
-      totals.azure += costs.azure;
-      totals.gcp += costs.gcp;
+      ALL_PROVIDERS.forEach((p) => {
+        if (costs[p] != null) totals[p] += costs[p];
+      });
 
       breakdown.push({
         label: `${service.label} — ${option.name}`,
@@ -240,9 +248,14 @@ function App() {
 
   const { totals, breakdown } = calculateCosts();
   const hasSelections = Object.keys(selections).length > 0;
-  const cheapest = hasSelections
-    ? Object.entries(totals).reduce((a, b) => (a[1] < b[1] ? a : b))[0]
+  // Only consider providers that have at least one non-null cost in the breakdown
+  const activeProviders = hasSelections
+    ? ALL_PROVIDERS.filter((p) => breakdown.some((b) => b.costs[p] != null))
+    : [];
+  const cheapest = activeProviders.length > 0
+    ? activeProviders.reduce((a, b) => (totals[a] <= totals[b] ? a : b))
     : null;
+  const maxTotal = Math.max(...activeProviders.map((p) => totals[p]), 1);
 
   const getAiTips = async () => {
     if (freeUsed >= FREE_LIMIT) {
@@ -305,8 +318,6 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
     return `$${n.toFixed(2)}`;
   };
 
-  const maxTotal = Math.max(totals.aws, totals.azure, totals.gcp, 1);
-
   return (
     <div style={{
       minHeight: "100vh",
@@ -352,7 +363,7 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
             <span style={{ color: "#22C55E" }}>Cut your bill.</span>
           </h1>
           <p style={{ fontSize: "14px", color: "#71717A", margin: 0, maxWidth: "500px", lineHeight: 1.6 }}>
-            Select your infrastructure, see real pricing across AWS, Azure &amp; GCP, and get AI-powered optimization tips.
+            Select your infrastructure, see real pricing across AWS, Azure, GCP, Hetzner, OVH &amp; Scaleway, and get AI-powered optimization tips.
           </p>
         </header>
 
@@ -394,7 +405,7 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
             }}>
               <span style={{ fontSize: "16px" }}>👇</span>
               <span style={{ fontSize: "13px", color: "#A1A1AA", lineHeight: 1.5 }}>
-                Check the services you use, adjust quantities, then hit <strong style={{ color: "#E4E4E7" }}>View Results</strong> to see costs compared across all three clouds.
+                Check the services you use, adjust quantities, then hit <strong style={{ color: "#E4E4E7" }}>View Results</strong> to see costs compared across 6 cloud providers.
               </span>
             </div>
             {Object.entries(CLOUD_SERVICES).map(([catKey, category]) => (
@@ -402,18 +413,22 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                 <div style={{ padding: "14px 18px", borderBottom: "1px solid #27272A", display: "flex", alignItems: "center", gap: "10px" }}>
                   <span style={{ fontSize: "18px" }}>{(() => { const Icon = category.icon; return <Icon size={18} strokeWidth={1.5} color="#A1A1AA" />; })()}</span>
                   <span style={{ fontWeight: 600, fontSize: "14px" }}>{category.label}</span>
-                  <div style={{ display: "flex", gap: "14px", alignItems: "center", marginLeft: "auto" }}>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center", marginLeft: "auto", flexWrap: "wrap" }}>
                     <span style={{ fontFamily: MONO, fontSize: "10px", color: "#71717A" }}>{category.unit}</span>
-                    <span style={{ fontFamily: MONO, fontSize: "9px", color: PROVIDER_COLORS.aws }}>● AWS</span>
-                    <span style={{ fontFamily: MONO, fontSize: "9px", color: PROVIDER_COLORS.azure }}>● Azure</span>
-                    <span style={{ fontFamily: MONO, fontSize: "9px", color: PROVIDER_COLORS.gcp }}>● GCP</span>
+                    {ALL_PROVIDERS.map((p) => {
+                      const hasAny = category.options.some((o) => o[p] != null);
+                      if (!hasAny) return null;
+                      return <span key={p} style={{ fontFamily: MONO, fontSize: "9px", color: PROVIDER_COLORS[p] }}>● {PROVIDER_NAMES[p]}</span>;
+                    })}
                   </div>
                 </div>
                 <div style={{ padding: "8px" }}>
                   {category.options.map((option, idx) => {
                     const key = `${catKey}-${idx}`;
                     const selected = !!selections[key];
-                    const lowest = Math.min(option.aws, option.azure, option.gcp);
+                    const availablePrices = ALL_PROVIDERS.filter((p) => option[p] != null).map((p) => option[p]);
+                    const lowest = availablePrices.length > 0 ? Math.min(...availablePrices) : null;
+                    const availableProviders = ALL_PROVIDERS.filter((p) => option[p] != null);
                     return (
                       <div key={idx} style={{
                         display: "flex", alignItems: "center", gap: "12px", padding: "10px 12px",
@@ -432,16 +447,16 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                           {selected && "✓"}
                         </div>
                         <span style={{ fontSize: "13px", flex: 1, minWidth: "140px" }}>{option.name}</span>
-                        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-                          {["aws", "azure", "gcp"].map((p) => (
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                          {availableProviders.map((p) => (
                             <span key={p} style={{
                               fontFamily: MONO, fontSize: "11px",
                               color: option[p] === lowest ? "#22C55E" : "#A1A1AA",
                               fontWeight: option[p] === lowest ? 600 : 400,
-                              minWidth: "80px",
+                              minWidth: "70px",
                             }}>
                               <span style={{ color: PROVIDER_COLORS[p], fontSize: "9px", marginRight: "3px" }}>●</span>
-                              <span style={{ color: PROVIDER_COLORS[p], fontSize: "9px", marginRight: "4px" }}>{PROVIDER_NAMES[p]}</span>
+                              <span style={{ color: PROVIDER_COLORS[p], fontSize: "9px", marginRight: "3px" }}>{PROVIDER_NAMES[p]}</span>
                               ${option[p].toFixed(4)}
                             </span>
                           ))}
@@ -512,7 +527,7 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                     Estimated Monthly Cost
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                    {["aws", "azure", "gcp"].map((p) => {
+                    {activeProviders.map((p) => {
                       const pct = maxTotal > 0 ? (totals[p] / maxTotal) * 100 : 0;
                       const isCheapest = p === cheapest;
                       return (
@@ -559,7 +574,7 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                     }}>
                       💡 {PROVIDER_NAMES[cheapest]} saves you{" "}
                       <strong>
-                        {formatMoney(Math.max(...Object.values(totals)) - totals[cheapest])}
+                        {formatMoney(Math.max(...activeProviders.map((p) => totals[p])) - totals[cheapest])}
                       </strong>
                       /mo vs the most expensive option
                     </div>
@@ -574,43 +589,45 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                     </span>
                   </div>
                   <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: MONO, fontSize: "12px" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: MONO, fontSize: "12px", minWidth: `${activeProviders.length * 90 + 200}px` }}>
                       <thead>
                         <tr style={{ borderBottom: "1px solid #27272A" }}>
-                          <th style={{ padding: "10px 16px", textAlign: "left", color: "#71717A", fontWeight: 500 }}>Service</th>
-                          <th style={{ padding: "10px 16px", textAlign: "right", color: PROVIDER_COLORS.aws, fontWeight: 500 }}>AWS</th>
-                          <th style={{ padding: "10px 16px", textAlign: "right", color: PROVIDER_COLORS.azure, fontWeight: 500 }}>Azure</th>
-                          <th style={{ padding: "10px 16px", textAlign: "right", color: PROVIDER_COLORS.gcp, fontWeight: 500 }}>GCP</th>
+                          <th style={{ padding: "10px 12px", textAlign: "left", color: "#71717A", fontWeight: 500 }}>Service</th>
+                          {activeProviders.map((p) => (
+                            <th key={p} style={{ padding: "10px 8px", textAlign: "right", color: PROVIDER_COLORS[p], fontWeight: 500, fontSize: "11px" }}>{PROVIDER_NAMES[p]}</th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody>
                         {breakdown.map((item, i) => {
-                          const cheapestProvider = Object.entries(item.costs).reduce((a, b) => a[1] < b[1] ? a : b)[0];
+                          const availCosts = activeProviders.filter((p) => item.costs[p] != null);
+                          const minCost = availCosts.length > 0 ? Math.min(...availCosts.map((p) => item.costs[p])) : null;
+                          const cheapestP = availCosts.find((p) => item.costs[p] === minCost);
                           return (
                             <tr key={i} style={{ borderBottom: "1px solid #1E1E22" }}>
-                              <td style={{ padding: "10px 16px", color: "#A1A1AA" }}>
+                              <td style={{ padding: "10px 12px", color: "#A1A1AA" }}>
                                 {item.label}
                                 <span style={{ color: "#52525B", fontSize: "10px", marginLeft: "6px" }}>
                                   ×{item.qty}
                                 </span>
                               </td>
-                              {["aws", "azure", "gcp"].map((p) => (
+                              {activeProviders.map((p) => (
                                 <td key={p} style={{
-                                  padding: "10px 16px", textAlign: "right",
-                                  color: p === cheapestProvider ? "#22C55E" : "#A1A1AA",
-                                  fontWeight: p === cheapestProvider ? 600 : 400,
+                                  padding: "10px 8px", textAlign: "right",
+                                  color: item.costs[p] == null ? "#3F3F46" : p === cheapestP ? "#22C55E" : "#A1A1AA",
+                                  fontWeight: p === cheapestP ? 600 : 400,
                                 }}>
-                                  {formatMoney(item.costs[p])}
+                                  {item.costs[p] == null ? "—" : formatMoney(item.costs[p])}
                                 </td>
                               ))}
                             </tr>
                           );
                         })}
                         <tr style={{ borderTop: "2px solid #27272A" }}>
-                          <td style={{ padding: "12px 16px", fontWeight: 700, color: "#E4E4E7" }}>TOTAL</td>
-                          {["aws", "azure", "gcp"].map((p) => (
+                          <td style={{ padding: "12px 12px", fontWeight: 700, color: "#E4E4E7" }}>TOTAL</td>
+                          {activeProviders.map((p) => (
                             <td key={p} style={{
-                              padding: "12px 16px", textAlign: "right", fontWeight: 700, fontSize: "14px",
+                              padding: "12px 8px", textAlign: "right", fontWeight: 700, fontSize: "14px",
                               color: p === cheapest ? "#22C55E" : "#E4E4E7",
                             }}>
                               {formatMoney(totals[p])}
@@ -743,16 +760,18 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
                       "",
                       ...breakdown.map((b) => {
-                        const min = Math.min(b.costs.aws, b.costs.azure, b.costs.gcp);
-                        const winner = Object.entries(b.costs).find(([, v]) => v === min)[0];
-                        return `${b.label} (×${b.qty})\n  AWS: $${b.costs.aws.toFixed(2)} | Azure: $${b.costs.azure.toFixed(2)} | GCP: $${b.costs.gcp.toFixed(2)} → ${PROVIDER_NAMES[winner]} wins`;
+                        const avail = activeProviders.filter((p) => b.costs[p] != null);
+                        const min = avail.length > 0 ? Math.min(...avail.map((p) => b.costs[p])) : 0;
+                        const winner = avail.find((p) => b.costs[p] === min) || avail[0];
+                        const priceStr = avail.map((p) => `${PROVIDER_NAMES[p]}: $${b.costs[p].toFixed(2)}`).join(" | ");
+                        return `${b.label} (×${b.qty})\n  ${priceStr} → ${PROVIDER_NAMES[winner]} wins`;
                       }),
                       "",
                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-                      `TOTALS:  AWS $${totals.aws.toFixed(2)}  |  Azure $${totals.azure.toFixed(2)}  |  GCP $${totals.gcp.toFixed(2)}`,
-                      `💰 ${PROVIDER_NAMES[cheapest]} is cheapest — saves ${formatMoney(Math.max(...Object.values(totals)) - totals[cheapest])}/mo`,
+                      `TOTALS: ${activeProviders.map((p) => `${PROVIDER_NAMES[p]} $${totals[p].toFixed(2)}`).join("  |  ")}`,
+                      `💰 ${PROVIDER_NAMES[cheapest]} is cheapest — saves ${formatMoney(Math.max(...activeProviders.map((p) => totals[p])) - totals[cheapest])}/mo`,
                       "",
-                      "Compare your own stack → cloudcostiq.com",
+                      "Compare your own stack → cloudcostiq.vercel.app",
                     ];
                     try {
                       await navigator.clipboard.writeText(lines.join("\n"));
