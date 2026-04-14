@@ -162,7 +162,18 @@ function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [activeTab, setActiveTab] = useState("calculator");
+  const [commitTier, setCommitTier] = useState("ondemand");
   const resultsRef = useRef(null);
+
+  // Commitment discount multipliers (1 = full price, 0.65 = 35% off)
+  // Only applies to compute-type services, not storage/transfer/serverless
+  const COMMIT_DISCOUNTS = {
+    ondemand: { aws: 1, azure: 1, gcp: 1, hetzner: 1, ovh: 1, scaleway: 1 },
+    "1yr": { aws: 0.64, azure: 0.63, gcp: 0.73, hetzner: 1, ovh: 0.85, scaleway: 0.85 },
+    "3yr": { aws: 0.42, azure: 0.40, gcp: 0.43, hetzner: 1, ovh: 0.70, scaleway: 0.70 },
+  };
+  // Categories where commitment discounts apply
+  const COMMIT_CATEGORIES = ["compute", "database", "cache", "kubernetes"];
 
   const FREE_LIMIT = 3;
 
@@ -224,10 +235,16 @@ function App() {
       const service = CLOUD_SERVICES[category];
       const option = service.options[optionIdx];
       const qty = quantities[key] || 0;
+      const applyDiscount = COMMIT_CATEGORIES.includes(category);
 
       const costs = {};
       ALL_PROVIDERS.forEach((p) => {
-        costs[p] = option[p] != null ? option[p] * qty : null;
+        if (option[p] == null) {
+          costs[p] = null;
+        } else {
+          const discount = applyDiscount ? COMMIT_DISCOUNTS[commitTier][p] : 1;
+          costs[p] = option[p] * discount * qty;
+        }
       });
 
       ALL_PROVIDERS.forEach((p) => {
@@ -267,7 +284,10 @@ function App() {
     setAiTips(null);
 
     const configSummary = breakdown
-      .map((b) => `${b.category} - ${b.label}: ${b.qty} ${b.unit} → AWS $${b.costs.aws.toFixed(2)}, Azure $${b.costs.azure.toFixed(2)}, GCP $${b.costs.gcp.toFixed(2)}`)
+      .map((b) => {
+        const prices = activeProviders.filter((p) => b.costs[p] != null).map((p) => `${PROVIDER_NAMES[p]} $${b.costs[p].toFixed(2)}`).join(", ");
+        return `${b.category} - ${b.label}: ${b.qty} ${b.unit} → ${prices}`;
+      })
       .join("\n");
 
     try {
@@ -282,13 +302,13 @@ function App() {
               role: "user",
               content: `You are a cloud cost optimization expert. Analyze this cloud infrastructure configuration and provide 3-5 specific, actionable tips to reduce costs by 20-40%. Be specific about which provider to choose for each service and why. Mention reserved instances, spot instances, committed use discounts, right-sizing, and architecture changes where relevant.
 
+PRICING MODEL: ${commitTier === "ondemand" ? "On-Demand" : commitTier === "1yr" ? "1-Year Commitment" : "3-Year Commitment"}
+
 CURRENT CONFIGURATION:
 ${configSummary}
 
 MONTHLY TOTALS:
-AWS: $${totals.aws.toFixed(2)}
-Azure: $${totals.azure.toFixed(2)}
-GCP: $${totals.gcp.toFixed(2)}
+${activeProviders.map((p) => `${PROVIDER_NAMES[p]}: $${totals[p].toFixed(2)}`).join("\n")}
 
 Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3 sentences of specific advice), and "savings" (estimated percentage savings for this tip). Return ONLY valid JSON, no markdown, no backticks.`,
             },
@@ -375,8 +395,43 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
         }}>
           <span style={{ fontSize: "13px" }}>⚠️</span>
           <span style={{ fontFamily: MONO, fontSize: "10px", color: "#FACC15", lineHeight: 1.5 }}>
-            Estimates based on published US-East on-demand rates (Apr 2026). Always verify with official provider calculators before purchasing.
+            Estimates based on published US-East rates (Apr 2026). Always verify with official provider calculators before purchasing.
           </span>
+        </div>
+
+        {/* COMMITMENT TIER TOGGLE */}
+        <div style={{ marginBottom: "20px" }}>
+          <div style={{ fontFamily: MONO, fontSize: "10px", letterSpacing: "1.5px", color: "#71717A", textTransform: "uppercase", marginBottom: "8px" }}>
+            Pricing Model
+          </div>
+          <div style={{ display: "flex", gap: "2px", background: "#18181B", borderRadius: "8px", padding: "3px", width: "fit-content" }}>
+            {[
+              { id: "ondemand", label: "On-Demand" },
+              { id: "1yr", label: "1-Year Commit" },
+              { id: "3yr", label: "3-Year Commit" },
+            ].map((tier) => (
+              <button key={tier.id} onClick={() => setCommitTier(tier.id)} style={{
+                padding: "8px 16px", borderRadius: "6px", border: "none", fontFamily: MONO, fontSize: "12px",
+                letterSpacing: "0.5px", cursor: "pointer", transition: "all 0.2s",
+                background: commitTier === tier.id ? (tier.id === "ondemand" ? "#27272A" : "rgba(34,197,94,0.15)") : "transparent",
+                color: commitTier === tier.id ? (tier.id === "ondemand" ? "#E4E4E7" : "#22C55E") : "#71717A",
+              }}>
+                {tier.label}
+                {tier.id !== "ondemand" && commitTier === tier.id && (
+                  <span style={{ marginLeft: "6px", fontSize: "10px", color: "#22C55E" }}>
+                    {tier.id === "1yr" ? "~30-37% off" : "~40-60% off"}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+          {commitTier !== "ondemand" && (
+            <div style={{ fontFamily: MONO, fontSize: "10px", color: "#52525B", marginTop: "6px", lineHeight: 1.5 }}>
+              Discounts apply to compute, database, cache &amp; K8s. Storage, transfer &amp; serverless stay at on-demand rates.
+              {commitTier === "1yr" && " Hetzner does not offer commitment discounts."}
+              {commitTier === "3yr" && " Hetzner does not offer commitment discounts."}
+            </div>
+          )}
         </div>
 
         {/* TABS */}
@@ -523,8 +578,15 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
               <>
                 {/* TOTAL COMPARISON BARS */}
                 <div style={{ background: "#18181B", borderRadius: "10px", border: "1px solid #27272A", padding: "24px" }}>
-                  <div style={{ fontFamily: MONO, fontSize: "11px", letterSpacing: "1.5px", color: "#71717A", textTransform: "uppercase", marginBottom: "20px" }}>
+                  <div style={{ fontFamily: MONO, fontSize: "11px", letterSpacing: "1.5px", color: "#71717A", textTransform: "uppercase", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
                     Estimated Monthly Cost
+                    <span style={{
+                      fontSize: "10px", padding: "2px 8px", borderRadius: "4px", letterSpacing: "0.5px", textTransform: "none",
+                      background: commitTier === "ondemand" ? "#27272A" : "rgba(34,197,94,0.15)",
+                      color: commitTier === "ondemand" ? "#A1A1AA" : "#22C55E",
+                    }}>
+                      {commitTier === "ondemand" ? "On-Demand" : commitTier === "1yr" ? "1-Year Committed" : "3-Year Committed"}
+                    </span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                     {activeProviders.map((p) => {
@@ -757,6 +819,7 @@ Respond with a JSON array of objects with "title" (short, 5-8 words), "tip" (2-3
                   <button onClick={async () => {
                     const lines = [
                       "☁️ CloudCostIQ — Cloud Cost Comparison",
+                      `Pricing: ${commitTier === "ondemand" ? "On-Demand" : commitTier === "1yr" ? "1-Year Committed" : "3-Year Committed"}`,
                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
                       "",
                       ...breakdown.map((b) => {
